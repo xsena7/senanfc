@@ -130,7 +130,7 @@ export function ActivateForm({ code, clients }: { code: string; clients: C[] }) 
       {/* 3. Links */}
       {kind && (name.trim() || client) && (
         <section className="card space-y-3">
-          <h2 className="font-bold">3. Configure {kind === "KIT" ? "os links" : `o ${KIND_LABEL[kind]}`}</h2>
+          <h2 className="font-bold">3. Configure {kind === "KIT" ? "os links" : "o link"}</h2>
           <ClientFields key={`${client?.id ?? "novo"}-${kind}`} v={{ ...(client ?? {}), name: client?.name ?? name }} only={FIELDS_FOR[kind]} hideName />
         </section>
       )}

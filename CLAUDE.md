@@ -29,6 +29,9 @@ Next.js 15 (App Router, server actions) · Prisma 6 + Postgres (Neon) · Tailwin
 - Painel: escuro também (`tech panel` no layout; `.panel` em `globals.css` converte as classes claras como `bg-white`, `text-slate-500`), animação de entrada em `src/app/painel/template.tsx`, mobile-first. Ícones: `lucide-react` + logos das marcas em `src/components/icons.tsx` (`KindIcon`). Não usar emoji na interface.
 - Botão "Quero minha placa" usa `CONTACT_WHATSAPP` (variável na Vercel).
 
+## Link do Google (avaliação)
+- O vendedor cola o link do Google Maps; `src/lib/google-resolve.ts` (ação `src/app/actions/google.ts`, campo `src/components/google-field.tsx`) segue o link curto só por domínios do Google e monta o link: com ID `ChIJ` no link → `search.google.com/local/writereview?placeid=`; com `GOOGLE_PLACES_API_KEY` (opcional) → pergunta o ID ao Google; senão usa o código do lugar (`!1s0x..:0x..`) → `google.com/search?...#lrd=<código>,3` (abre "Escrever avaliação"). Gerador externo só como plano B.
+
 ## App (PWA)
 - Manifesto em `src/app/manifest.ts` (abre em `/painel`), ícones PNG em `public/` (`icon-192/512`, `icon-maskable-512`, `apple-touch-icon`), service worker `public/sw.js` (só a página `offline.html`, não guarda telas do painel). Cartão "Instale o app" em `src/components/pwa.tsx`.
 - No iPhone o NFC abre o link no Safari, que tem login separado do app instalado: por isso a tela "Placa nova" tem "Sou vendedor: entrar e ativar" (volta para a placa depois do login).

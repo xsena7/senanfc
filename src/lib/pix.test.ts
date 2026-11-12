@@ -30,3 +30,15 @@ test("normalizações", () => {
   assert.equal(normalizePixKey("123.456.789-09", "CPF"), "12345678909");
   assert.equal(normalizePixKey("x", "EMAIL"), null);
 });
+
+import { googleLinkKind } from "./google-link.ts";
+test("link do Google", () => {
+  assert.equal(googleLinkKind("https://search.google.com/local/writereview?placeid=ChIJN1t_tDeuEmsRUsoyG83frY4"), "review");
+  assert.equal(googleLinkKind("g.page/r/CabcDEF123/review"), "review");
+  assert.equal(googleLinkKind("https://g.co/kgs/abc123"), "review");
+  assert.equal(googleLinkKind("https://maps.app.goo.gl/xyz"), "other");
+  assert.equal(googleLinkKind(""), "");
+});
+test("link lrd conta como avaliação", () => {
+  assert.equal(googleLinkKind("https://www.google.com/search?q=x&ludocid=1#lrd=0x935ef1b2:0x5a1b2c3d,3,,,,"), "review");
+});

@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { PIX_KEY_LABEL, type PixKeyTypeT } from "@/lib/pix-key";
 import { KindIcon } from "./icons";
+import { GoogleField } from "./google-field";
 
 export type ClientValues = {
   name?: string | null;
@@ -86,11 +87,7 @@ export function ClientFields({ v = {}, only, hideName }: { v?: ClientValues; onl
           <input name="pixCity" defaultValue={v.pixCity ?? "Goiânia"} className="input" placeholder="Cidade" />
         </div>
       </div>}
-      {show("GOOGLE") && <div>
-        <label className="label flex items-center gap-2"><KindIcon kind="GOOGLE" size="sm" /> Link de avaliação do Google</label>
-        <input name="googleUrl" defaultValue={v.googleUrl ?? ""} className="input" autoCapitalize="none" autoCorrect="off" inputMode="url" placeholder="https://g.page/r/.../review" />
-        <p className="mt-1 text-xs text-slate-500">O dono pega no Google: Perfil da Empresa → &quot;Pedir avaliações&quot; → copiar link.</p>
-      </div>}
+      {show("GOOGLE") && <GoogleField initial={v.googleUrl ?? ""} />}
       {show("NOTES") && <div>
         <label className="label">Observações</label>
         <input name="notes" defaultValue={v.notes ?? ""} className="input" placeholder="Endereço, falar com..." />
