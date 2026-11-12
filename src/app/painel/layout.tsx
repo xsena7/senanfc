@@ -8,10 +8,10 @@ export default async function PainelLayout({ children }: { children: React.React
   const user = await requireUser();
   const admin = user.role === "ADMIN";
   const items = [
-    { href: "/painel", label: "Início", icon: "🏠" },
-    { href: "/painel/clientes", label: "Clientes", icon: "🏪" },
-    { href: "/painel/vendas", label: "Vendas", icon: "💰" },
-    ...(admin ? [{ href: "/painel/placas", label: "Placas", icon: "🏷️" }, { href: "/painel/equipe", label: "Equipe", icon: "👥" }] : []),
+    { href: "/painel", label: "Início", icon: "house" as const },
+    { href: "/painel/clientes", label: "Clientes", icon: "store" as const },
+    { href: "/painel/vendas", label: "Vendas", icon: "wallet" as const },
+    ...(admin ? [{ href: "/painel/placas", label: "Placas", icon: "tags" as const }, { href: "/painel/equipe", label: "Equipe", icon: "users" as const }] : []),
   ];
   return (
     <div className="mx-auto min-h-dvh max-w-2xl pb-24">

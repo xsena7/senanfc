@@ -4,7 +4,9 @@ import { activatePlateAction } from "@/app/actions/plates";
 import { ClientFields, type ClientValues } from "@/components/client-fields";
 import { Msg } from "@/components/form-bits";
 import { useKeepForm } from "@/components/use-form";
-import { KIND_EMOJI, KIND_LABEL, PAYMENT_LABEL, PRODUCT_PRICE, type PaymentT, type PlateKindT } from "@/lib/catalog";
+import { KIND_LABEL, PAYMENT_LABEL, PRODUCT_PRICE, type PaymentT, type PlateKindT } from "@/lib/catalog";
+import { KindIcon } from "@/components/icons";
+import { CircleCheck, Sparkles } from "lucide-react";
 
 type OpenSale = { id: string; when: string; missing: number };
 type C = ClientValues & { id: string; name: string; openSales: OpenSale[] };
@@ -71,7 +73,7 @@ export function ActivateForm({ code, clients }: { code: string; clients: C[] }) 
       <input type="hidden" name="payment" value={needsPayment ? payment : ""} />
 
       <div className="text-center">
-        <p className="text-4xl">✨</p>
+        <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-cyan-400 text-white shadow-lg"><Sparkles className="h-7 w-7" /></span>
         <h1 className="mt-1 text-2xl font-extrabold">Placa nova</h1>
         <p className="text-sm text-slate-500">Código {code}</p>
       </div>
@@ -105,9 +107,9 @@ export function ActivateForm({ code, clients }: { code: string; clients: C[] }) 
                 type="button"
                 data-kind={k}
                 onClick={() => setKindRaw(k)}
-                className={`rounded-xl border-2 px-2 py-3 text-left font-semibold ${k === "KIT" ? "col-span-2" : ""} ${kind === k ? "border-brand-600 bg-brand-50" : "border-slate-200 bg-white"}`}
+                className={`flex items-center gap-2 rounded-xl border-2 px-2 py-3 text-left font-semibold ${k === "KIT" ? "col-span-2" : ""} ${kind === k ? "border-brand-600 bg-brand-50" : "border-slate-200 bg-white"}`}
               >
-                <span className="text-xl">{KIND_EMOJI[k]}</span> {KIND_LABEL[k]}
+                <KindIcon kind={k} /> {KIND_LABEL[k]}
               </button>
             ))}
           </div>
@@ -170,7 +172,7 @@ export function ActivateForm({ code, clients }: { code: string; clients: C[] }) 
       <Msg state={state} />
       {step3 && (
         <button type="submit" disabled={pending || !ready} className="btn-primary w-full py-4 text-lg">
-          {pending ? "Ativando..." : ready ? "✅ Ativar placa" : needsPayment && !payment ? "Escolha como pagou" : "Escolha o cliente"}
+          {pending ? "Ativando..." : ready ? <><CircleCheck className="h-5 w-5" /> Ativar placa</> : needsPayment && !payment ? "Escolha como pagou" : "Escolha o cliente"}
         </button>
       )}
     </form>

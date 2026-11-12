@@ -36,7 +36,7 @@ export function CopyButton({ text, label, className = "btn-primary w-full" }: { 
   }
   return (
     <button type="button" onClick={copy} className={className}>
-      {done ? "✅ Copiado!" : label}
+      {done ? "Copiado!" : label}
     </button>
   );
 }

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { brl, dateTime } from "@/lib/format";
-import { KIND_EMOJI, PAYMENT_LABEL, PRODUCT_LABEL } from "@/lib/catalog";
+import { PAYMENT_LABEL, PRODUCT_LABEL } from "@/lib/catalog";
+import { KindIcon } from "./icons";
 import { deleteSaleAction, markPaidAction } from "@/app/actions/sales";
 import { ConfirmButton } from "./form-bits";
 import type { Prisma } from "@prisma/client";
@@ -13,9 +14,10 @@ export function SaleRow({ s, showSeller, isAdmin }: { s: SaleFull; showSeller: b
       <div className="flex items-start justify-between gap-2">
         <div>
           <Link href={`/painel/clientes/${s.client.id}`} className="font-semibold">{s.client.name}</Link>
-          <p className="text-sm text-slate-500">
-            {PRODUCT_LABEL[s.product]} {s.plates.map((p) => (p.kind ? KIND_EMOJI[p.kind] : "")).join(" ")} · {dateTime(s.createdAt)}
-            {showSeller && ` · ${s.seller.name.split(" ")[0]}`}
+          <p className="flex flex-wrap items-center gap-1 text-sm text-slate-500">
+            {PRODUCT_LABEL[s.product]}
+            {s.plates.map((p) => (p.kind ? <KindIcon key={p.id} kind={p.kind} size="sm" /> : null))}
+            <span>· {dateTime(s.createdAt)}{showSeller && ` · ${s.seller.name.split(" ")[0]}`}</span>
           </p>
         </div>
         <div className="text-right">

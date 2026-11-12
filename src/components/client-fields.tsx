@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { PIX_KEY_LABEL, type PixKeyTypeT } from "@/lib/pix-key";
+import { KindIcon } from "./icons";
 
 export type ClientValues = {
   name?: string | null;
@@ -45,15 +46,15 @@ export function ClientFields({ v = {}, only }: { v?: ClientValues; only?: Key[] 
         <input name="name" defaultValue={v.name ?? ""} className="input" placeholder="Ex.: Padaria do Zé" required />
       </div>
       {show("WHATSAPP") && <div>
-        <label className="label">💬 WhatsApp da loja</label>
+        <label className="label flex items-center gap-2"><KindIcon kind="WHATSAPP" size="sm" /> WhatsApp da loja</label>
         <input name="whatsapp" defaultValue={fmtZap(v.whatsapp)} className="input" inputMode="tel" placeholder="(62) 99999-8888" />
       </div>}
       {show("INSTAGRAM") && <div>
-        <label className="label">📸 Instagram</label>
+        <label className="label flex items-center gap-2"><KindIcon kind="INSTAGRAM" size="sm" /> Instagram</label>
         <input name="instagram" defaultValue={v.instagram ? "@" + v.instagram : ""} className="input" autoCapitalize="none" autoCorrect="off" placeholder="@padariadoze" />
       </div>}
       {show("PIX") && <div className="space-y-2">
-        <label className="label">💠 Chave Pix</label>
+        <label className="label flex items-center gap-2"><KindIcon kind="PIX" size="sm" /> Chave Pix</label>
         <div className="grid grid-cols-5 gap-1">
           {(Object.keys(PIX_KEY_LABEL) as PixKeyTypeT[]).map((t) => (
             <button
@@ -82,7 +83,7 @@ export function ClientFields({ v = {}, only }: { v?: ClientValues; only?: Key[] 
         </div>
       </div>}
       {show("GOOGLE") && <div>
-        <label className="label">⭐ Link de avaliação do Google</label>
+        <label className="label flex items-center gap-2"><KindIcon kind="GOOGLE" size="sm" /> Link de avaliação do Google</label>
         <input name="googleUrl" defaultValue={v.googleUrl ?? ""} className="input" autoCapitalize="none" autoCorrect="off" inputMode="url" placeholder="https://g.page/r/.../review" />
         <p className="mt-1 text-xs text-slate-500">O dono pega no Google: Perfil da Empresa → &quot;Pedir avaliações&quot; → copiar link.</p>
       </div>}

@@ -22,6 +22,11 @@ Next.js 15 (App Router, server actions) · Prisma 6 + Postgres (Neon) · Tailwin
 - Ações: `src/app/actions/*.ts`. Painel: `src/app/painel/*` (Placas e Equipe só para ADMIN; vendedor vê só as vendas dele).
 - Lotes: `/painel/placas` gera códigos; o lote mostra os links para gravar no NFC Tools (iPhone) ou grava em sequência pelo Chrome do Android (Web NFC, com trava).
 
+## Visual
+- Site e páginas das placas: visual escuro "tecnológico" (classe `.tech`, `glass`, `text-glow` em `src/app/globals.css`). Página inicial em `src/app/page.tsx`, demonstração em `/demo`, telas públicas em `src/components/public-views.tsx`.
+- Painel: claro, mobile-first. Ícones: `lucide-react` + logos das marcas em `src/components/icons.tsx` (`KindIcon`). Não usar emoji na interface.
+- Botão "Quero minha placa" usa `CONTACT_WHATSAPP` (variável na Vercel).
+
 ## Regras
 - Mudou o schema: criar migration em `prisma/migrations/<timestamp>_<nome>/migration.sql` (`npx prisma migrate diff --from-schema-datasource prisma/schema.prisma --to-schema-datamodel prisma/schema.prisma --script`).
 - Visual mobile-first (o vendedor usa no celular), botões grandes, textos para leigo.

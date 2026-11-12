@@ -2,7 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
-import { KIND_EMOJI, KIND_LABEL } from "@/lib/catalog";
+import { KIND_LABEL } from "@/lib/catalog";
+import { KindIcon } from "@/components/icons";
 import { SaleRow } from "@/components/sale-row";
 import { EditClient } from "./edit";
 
@@ -32,9 +33,12 @@ export default async function Cliente({ params, searchParams }: { params: Promis
       {plates.length === 0 && <p className="text-sm text-slate-500">Nenhuma placa.</p>}
       {plates.map((p) => (
         <Link key={p.id} href={`/p/${p.code}`} className="card flex items-center justify-between">
-          <div>
-            <p className="font-semibold">{p.kind ? `${KIND_EMOJI[p.kind]} ${KIND_LABEL[p.kind]}` : "—"}</p>
-            <p className="text-xs text-slate-500">Placa {p.code} · {p._count.taps} toques</p>
+          <div className="flex items-center gap-3">
+            {p.kind && <KindIcon kind={p.kind} />}
+            <div>
+              <p className="font-semibold">{p.kind ? KIND_LABEL[p.kind] : "—"}</p>
+              <p className="text-xs text-slate-500">Placa {p.code} · {p._count.taps} toques</p>
+            </div>
           </div>
           <span className={`chip ${p.status === "ACTIVE" ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-600"}`}>
             {p.status === "ACTIVE" ? "● Ativa" : "● Desativada"}

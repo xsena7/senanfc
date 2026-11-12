@@ -11,14 +11,6 @@ export const KIND_LABEL: Record<PlateKindT, string> = {
   KIT: "Kit 4 links",
 };
 
-export const KIND_EMOJI: Record<PlateKindT, string> = {
-  PIX: "💠",
-  GOOGLE: "⭐",
-  INSTAGRAM: "📸",
-  WHATSAPP: "💬",
-  KIT: "🔗",
-};
-
 export const PRODUCT_LABEL: Record<ProductT, string> = {
   SINGLE: "1 placa",
   DUO: "2 placas",

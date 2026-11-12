@@ -5,6 +5,7 @@ import { requireUser } from "@/lib/auth";
 import { normalizeCode } from "@/lib/codes";
 import { brl, plural, startOfDayBR, startOfMonthBR } from "@/lib/format";
 import { SaleRow } from "@/components/sale-row";
+import { SmartphoneNfc } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -34,8 +35,8 @@ export default async function PainelHome() {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl bg-brand-600 p-5 text-white">
-        <p className="text-lg font-bold">📲 Para vender</p>
+      <div className="rounded-2xl bg-gradient-to-br from-brand-600 to-cyan-500 p-5 text-white shadow-[0_15px_40px_-15px_rgba(37,84,232,.7)]">
+        <p className="flex items-center gap-2 text-lg font-bold"><SmartphoneNfc className="h-6 w-6" /> Para vender</p>
         <p className="mt-1 text-sm opacity-90">Encoste o iPhone numa placa nova. Vai abrir a tela de ativar: escolha o que ela abre, preencha o cliente e pronto.</p>
         <form action={goToPlate} className="mt-3 flex gap-2">
           <input name="code" className="input bg-white text-slate-900" placeholder="Ou digite o código da placa" autoCapitalize="characters" />

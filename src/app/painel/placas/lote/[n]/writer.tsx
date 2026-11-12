@@ -31,10 +31,10 @@ export function BatchWriter({ plates: initial }: { plates: P[] }) {
         if (lock) await reader.makeReadOnly();
         await markWrittenAction(p.id, true);
         setPlates((list) => list.map((x) => (x.id === p.id ? { ...x, written: true } : x)));
-        setMsg(`✅ ${p.code} gravada${lock ? " e travada" : ""}. Afaste e encoste a próxima.`);
+        setMsg(`${p.code} gravada${lock ? " e travada" : ""}. Afaste e encoste a próxima.`);
         await new Promise((r) => setTimeout(r, 1500));
       }
-      setMsg("🎉 Todas gravadas!");
+      setMsg("Todas gravadas!");
     } catch (e: any) {
       setMsg("Parou: " + (e?.message ?? "erro ao gravar") + ". Toque em gravar de novo para continuar.");
     }
@@ -75,7 +75,7 @@ export function BatchWriter({ plates: initial }: { plates: P[] }) {
           </div>
           <CopyButton text={p.url} label="Copiar" className="btn-ghost btn-sm" />
           <button onClick={() => toggle(p)} className={`btn-sm btn ${p.written ? "bg-emerald-100 text-emerald-700" : "border border-slate-300 bg-white"}`}>
-            {p.written ? "✓ Gravada" : "Gravada?"}
+            {p.written ? "Gravada" : "Gravada?"}
           </button>
         </div>
       ))}

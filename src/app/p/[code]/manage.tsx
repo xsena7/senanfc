@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { changeKindAction, resetPlateAction, setPlateStatusAction } from "@/app/actions/plates";
-import { KIND_EMOJI, KIND_LABEL, type PlateKindT } from "@/lib/catalog";
+import { KIND_LABEL, type PlateKindT } from "@/lib/catalog";
+import { KindIcon } from "@/components/icons";
+import { CircleCheck, Eye } from "lucide-react";
 import { ConfirmButton } from "@/components/form-bits";
 
 export async function ManagePlate({ code, justActivated, isAdmin }: { code: string; justActivated: boolean; isAdmin: boolean }) {
@@ -17,7 +19,7 @@ export async function ManagePlate({ code, justActivated, isAdmin }: { code: stri
     <div className="space-y-4">
       {justActivated && (
         <div className="rounded-2xl bg-emerald-600 p-4 text-white">
-          <p className="text-lg font-bold">✅ Placa ativada!</p>
+          <p className="flex items-center gap-2 text-lg font-bold"><CircleCheck className="h-6 w-6" /> Placa ativada!</p>
           <p className="text-sm opacity-90">Toque em &quot;Testar&quot; para ver o que o cliente vai ver.</p>
           {duoMissing && <p className="mt-2 rounded-lg bg-white/20 p-2 text-sm font-semibold">Venda de 2 placas: agora encoste o celular na 2ª placa.</p>}
         </div>
@@ -31,8 +33,8 @@ export async function ManagePlate({ code, justActivated, isAdmin }: { code: stri
           </span>
         </div>
         {plate.kind && (
-          <p className="text-2xl font-extrabold">
-            {KIND_EMOJI[plate.kind]} {KIND_LABEL[plate.kind]}
+          <p className="flex items-center gap-3 text-2xl font-extrabold">
+            <KindIcon kind={plate.kind} /> {KIND_LABEL[plate.kind]}
           </p>
         )}
         {plate.client && (
@@ -47,7 +49,7 @@ export async function ManagePlate({ code, justActivated, isAdmin }: { code: stri
 
       {plate.status === "ACTIVE" && (
         <a href={`/p/${plate.code}?ver=1`} className="btn-primary w-full py-4 text-lg">
-          👀 Testar (abrir como o cliente)
+          <Eye className="h-5 w-5" /> Testar (abrir como o cliente)
         </a>
       )}
 
@@ -57,7 +59,7 @@ export async function ManagePlate({ code, justActivated, isAdmin }: { code: stri
           <select name="kind" defaultValue={plate.kind ?? ""} className="input">
             {(Object.keys(KIND_LABEL) as PlateKindT[]).map((k) => (
               <option key={k} value={k}>
-                {KIND_EMOJI[k]} {KIND_LABEL[k]}
+                {KIND_LABEL[k]}
               </option>
             ))}
           </select>
