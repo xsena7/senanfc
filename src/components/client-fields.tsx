@@ -14,25 +14,45 @@ export type ClientValues = {
   notes?: string | null;
 };
 
-/** Campos do cliente. "focus" destaca o campo que a placa escolhida precisa. */
-export function ClientFields({ v = {}, focus }: { v?: ClientValues; focus?: string }) {
+type Key = "WHATSAPP" | "INSTAGRAM" | "PIX" | "GOOGLE" | "NOTES";
+const ALL: Key[] = ["WHATSAPP", "INSTAGRAM", "PIX", "GOOGLE", "NOTES"];
+
+/**
+ * Campos do cliente. "only" mostra só o que a placa precisa; os outros ficam escondidos
+ * (mas continuam sendo enviados com o valor atual, para não apagar nada do cliente).
+ */
+export function ClientFields({ v = {}, only }: { v?: ClientValues; only?: Key[] }) {
   const [pixType, setPixType] = useState<string>(v.pixKeyType ?? "");
-  const hi = (k: string) => (focus === k || (focus === "KIT") ? "ring-2 ring-brand-100 rounded-xl" : "");
+  const [more, setMore] = useState(false);
+  const show = (k: Key) => !only || more || only.includes(k);
+  const hidden = ALL.filter((k) => !show(k));
   return (
     <div className="space-y-3">
+      {hidden.includes("WHATSAPP") && <input type="hidden" name="whatsapp" value={v.whatsapp ?? ""} />}
+      {hidden.includes("INSTAGRAM") && <input type="hidden" name="instagram" value={v.instagram ?? ""} />}
+      {hidden.includes("GOOGLE") && <input type="hidden" name="googleUrl" value={v.googleUrl ?? ""} />}
+      {hidden.includes("NOTES") && <input type="hidden" name="notes" value={v.notes ?? ""} />}
+      {hidden.includes("PIX") && (
+        <>
+          <input type="hidden" name="pixKey" value={v.pixKey ?? ""} />
+          <input type="hidden" name="pixKeyType" value={v.pixKeyType ?? ""} />
+          <input type="hidden" name="pixName" value={v.pixName ?? ""} />
+          <input type="hidden" name="pixCity" value={v.pixCity ?? ""} />
+        </>
+      )}
       <div>
         <label className="label">Nome da loja *</label>
         <input name="name" defaultValue={v.name ?? ""} className="input" placeholder="Ex.: Padaria do Zé" required />
       </div>
-      <div className={hi("WHATSAPP")}>
+      {show("WHATSAPP") && <div>
         <label className="label">💬 WhatsApp da loja</label>
         <input name="whatsapp" defaultValue={fmtZap(v.whatsapp)} className="input" inputMode="tel" placeholder="(62) 99999-8888" />
-      </div>
-      <div className={hi("INSTAGRAM")}>
+      </div>}
+      {show("INSTAGRAM") && <div>
         <label className="label">📸 Instagram</label>
         <input name="instagram" defaultValue={v.instagram ? "@" + v.instagram : ""} className="input" autoCapitalize="none" autoCorrect="off" placeholder="@padariadoze" />
-      </div>
-      <div className={`space-y-2 ${hi("PIX")}`}>
+      </div>}
+      {show("PIX") && <div className="space-y-2">
         <label className="label">💠 Chave Pix</label>
         <div className="grid grid-cols-5 gap-1">
           {(Object.keys(PIX_KEY_LABEL) as PixKeyTypeT[]).map((t) => (
@@ -60,16 +80,21 @@ export function ClientFields({ v = {}, focus }: { v?: ClientValues; focus?: stri
           <input name="pixName" defaultValue={v.pixName ?? ""} className="input" placeholder="Nome de quem recebe" />
           <input name="pixCity" defaultValue={v.pixCity ?? "Goiânia"} className="input" placeholder="Cidade" />
         </div>
-      </div>
-      <div className={hi("GOOGLE")}>
+      </div>}
+      {show("GOOGLE") && <div>
         <label className="label">⭐ Link de avaliação do Google</label>
         <input name="googleUrl" defaultValue={v.googleUrl ?? ""} className="input" autoCapitalize="none" autoCorrect="off" inputMode="url" placeholder="https://g.page/r/.../review" />
         <p className="mt-1 text-xs text-slate-500">O dono pega no Google: Perfil da Empresa → &quot;Pedir avaliações&quot; → copiar link.</p>
-      </div>
-      <div>
+      </div>}
+      {show("NOTES") && <div>
         <label className="label">Observações</label>
         <input name="notes" defaultValue={v.notes ?? ""} className="input" placeholder="Endereço, falar com..." />
-      </div>
+      </div>}
+      {only && !more && hidden.length > 0 && (
+        <button type="button" onClick={() => setMore(true)} className="text-sm font-semibold text-brand-600">
+          + Preencher outros dados (opcional)
+        </button>
+      )}
     </div>
   );
 }
