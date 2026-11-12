@@ -18,7 +18,7 @@ const DEMO: PublicClient = {
 };
 
 const TABS: { k: "PIX" | "KIT"; label: string }[] = [
-  { k: "KIT", label: "Kit 4 links" },
+  { k: "KIT", label: "Kit completo" },
   { k: "PIX", label: "Pix" },
 ];
 
