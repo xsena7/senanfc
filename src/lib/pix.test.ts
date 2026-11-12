@@ -42,3 +42,18 @@ test("link do Google", () => {
 test("link lrd conta como avaliação", () => {
   assert.equal(googleLinkKind("https://www.google.com/search?q=x&ludocid=1#lrd=0x935ef1b2:0x5a1b2c3d,3,,,,"), "review");
 });
+
+import { detectPixKeyType } from "./pix-key.ts";
+test("detecta o tipo da chave Pix", () => {
+  assert.equal(detectPixKeyType("loja@gmail.com").type, "EMAIL");
+  assert.equal(detectPixKeyType("123e4567-e89b-12d3-a456-426614174000").type, "RANDOM");
+  assert.equal(detectPixKeyType("123.456.789-09").type, "CPF");
+  assert.equal(detectPixKeyType("12.345.678/0001-95").type, "CNPJ");
+  assert.equal(detectPixKeyType("12345678000195").type, "CNPJ");
+  assert.equal(detectPixKeyType("(62) 99999-8888").type, "PHONE");
+  assert.equal(detectPixKeyType("+55 62 99999-8888").type, "PHONE");
+  assert.equal(detectPixKeyType("62999998888").type, "PHONE"); // não é CPF válido
+  assert.deepEqual(detectPixKeyType("12345678909"), { type: "CPF" }); // CPF válido, não parece celular
+  assert.deepEqual(detectPixKeyType("62945678913").options ?? null, detectPixKeyType("62945678913").options ? ["CPF", "PHONE"] : null);
+  assert.equal(detectPixKeyType("abc").type, null);
+});

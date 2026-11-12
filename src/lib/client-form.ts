@@ -1,5 +1,5 @@
 import { normalizeInstagram, normalizeUrl, normalizeWhatsapp } from "./links";
-import { normalizePixKey, type PixKeyTypeT } from "./pix-key";
+import { detectPixKeyType, normalizePixKey, type PixKeyTypeT } from "./pix-key";
 import type { PlateKindT } from "./catalog";
 
 export type ClientData = {
@@ -39,8 +39,10 @@ export function parseClient(f: FormData): { data?: ClientData; error?: string } 
   let pixKey: string | null = null;
   let pixKeyType: PixKeyTypeT | null = null;
   if (rawPix) {
-    if (!PIX_TYPES.includes(typeRaw)) return { error: "Escolha o tipo da chave Pix." };
-    pixKeyType = typeRaw as PixKeyTypeT;
+    const det = detectPixKeyType(rawPix);
+    const t = PIX_TYPES.includes(typeRaw) ? typeRaw : det.options ? "" : det.type;
+    if (!t) return { error: det.options ? "Escolha se a chave Pix é CPF ou celular." : "Não reconheci a chave Pix. Confira os números." };
+    pixKeyType = t as PixKeyTypeT;
     pixKey = normalizePixKey(rawPix, pixKeyType);
     if (!pixKey) return { error: "Chave Pix não confere com o tipo escolhido. Confira os números." };
   }
