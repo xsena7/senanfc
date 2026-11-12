@@ -16,7 +16,7 @@ export default async function PainelLayout({ children }: { children: React.React
   ];
   return (
     <div className="tech panel min-h-dvh">
-      <header className="sticky top-0 z-20 border-b border-white/5 bg-[#05070d]/70 backdrop-blur-xl">
+      <header className="sticky top-0 z-20 border-b border-white/5 bg-[#05070d]/70 pt-[env(safe-area-inset-top)] backdrop-blur-xl">
         <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-3">
           <Link href="/painel"><Logo className="text-lg text-white" dark /></Link>
           <form action={logoutAction} className="flex items-center gap-3 text-sm">

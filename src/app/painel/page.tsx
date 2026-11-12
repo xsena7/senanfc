@@ -7,6 +7,7 @@ import { normalizeCode, platePath } from "@/lib/codes";
 import { dateTime, startOfDayBR } from "@/lib/format";
 import { KIND_LABEL } from "@/lib/catalog";
 import { KindIcon } from "@/components/icons";
+import { InstallCard } from "@/components/pwa";
 
 export const dynamic = "force-dynamic";
 
@@ -36,6 +37,8 @@ export default async function PainelHome() {
         <p className="text-sm text-white/50">{hello},</p>
         <h1 className="text-2xl font-extrabold tracking-tight text-white">{user.name.split(" ")[0]}</h1>
       </div>
+
+      <InstallCard />
 
       {/* Ativar */}
       <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-brand-600 via-brand-500 to-cyan-400 p-5 shadow-[0_25px_60px_-20px_rgba(37,84,232,.9)]">

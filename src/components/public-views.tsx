@@ -21,7 +21,7 @@ export type PublicClient = {
 export function PublicShell({ children }: { children: React.ReactNode }) {
   return (
     <main className="tech min-h-dvh">
-      <div className="mx-auto flex min-h-dvh max-w-md flex-col px-5 py-8">
+      <div className="mx-auto flex min-h-dvh max-w-md flex-col px-5 pb-8 pt-[max(env(safe-area-inset-top),2rem)]">
         <div className="flex-1">{children}</div>
         <Link href="/" className="mt-12 flex items-center justify-center gap-2 text-xs text-white/40">
           tecnologia <Logo className="text-xs text-white/70" dark />
@@ -115,13 +115,18 @@ export function KitView({ c }: { c: PublicClient }) {
   );
 }
 
-export function NoticeView({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) {
+export function NoticeView({ icon, title, text, action }: { icon: React.ReactNode; title: string; text: string; action?: { href: string; label: string } }) {
   return (
     <PublicShell>
       <div className="glass mt-20 p-8 text-center">
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white/5 text-white/80">{icon}</div>
         <h1 className="mt-4 text-xl font-bold text-white">{title}</h1>
         <p className="mt-2 text-white/60">{text}</p>
+        {action && (
+          <Link href={action.href} className="btn mt-6 w-full border border-white/15 bg-white/5 text-white hover:bg-white/10">
+            {action.label}
+          </Link>
+        )}
       </div>
     </PublicShell>
   );

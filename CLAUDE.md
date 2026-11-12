@@ -29,6 +29,10 @@ Next.js 15 (App Router, server actions) · Prisma 6 + Postgres (Neon) · Tailwin
 - Painel: escuro também (`tech panel` no layout; `.panel` em `globals.css` converte as classes claras como `bg-white`, `text-slate-500`), animação de entrada em `src/app/painel/template.tsx`, mobile-first. Ícones: `lucide-react` + logos das marcas em `src/components/icons.tsx` (`KindIcon`). Não usar emoji na interface.
 - Botão "Quero minha placa" usa `CONTACT_WHATSAPP` (variável na Vercel).
 
+## App (PWA)
+- Manifesto em `src/app/manifest.ts` (abre em `/painel`), ícones PNG em `public/` (`icon-192/512`, `icon-maskable-512`, `apple-touch-icon`), service worker `public/sw.js` (só a página `offline.html`, não guarda telas do painel). Cartão "Instale o app" em `src/components/pwa.tsx`.
+- No iPhone o NFC abre o link no Safari, que tem login separado do app instalado: por isso a tela "Placa nova" tem "Sou vendedor: entrar e ativar" (volta para a placa depois do login).
+
 ## Regras
 - Mudou o schema: criar migration em `prisma/migrations/<timestamp>_<nome>/migration.sql` (`npx prisma migrate diff --from-schema-datasource prisma/schema.prisma --to-schema-datamodel prisma/schema.prisma --script`).
 - Visual mobile-first (o vendedor usa no celular), botões grandes, textos para leigo.

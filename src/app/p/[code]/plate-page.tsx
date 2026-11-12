@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { currentUser } from "@/lib/auth";
-import { normalizeCode } from "@/lib/codes";
+import { normalizeCode, platePath } from "@/lib/codes";
 import { instagramUrl, whatsappUrl } from "@/lib/links";
 import { CircleHelp, Pause, Sparkles } from "lucide-react";
 import { KitView, NoticeView, PixView } from "@/components/public-views";
@@ -32,7 +32,7 @@ export async function PlatePage({ raw, sp }: { raw: string; sp: { ver?: string; 
       const list = clients.map(({ createdAt, notes, ...c }) => ({ ...c, notes, plates: c.plates.map((p) => ({ code: p.code, kind: p.kind, off: p.status === "DISABLED" })) }));
       return (
         <main className="tech panel min-h-dvh">
-          <div className="fade-up mx-auto max-w-md px-4 py-6">
+          <div className="fade-up mx-auto max-w-md px-4 pb-6 pt-[max(env(safe-area-inset-top),1.5rem)]">
             <ActivateForm code={code} clients={list} />
           </div>
         </main>
@@ -40,14 +40,14 @@ export async function PlatePage({ raw, sp }: { raw: string; sp: { ver?: string; 
     }
     return (
       <main className="tech panel min-h-dvh">
-        <div className="fade-up mx-auto max-w-md px-4 py-6">
+        <div className="fade-up mx-auto max-w-md px-4 pb-6 pt-[max(env(safe-area-inset-top),1.5rem)]">
           <ManagePlate code={code} justActivated={sp.ok === "1"} isAdmin={user.role === "ADMIN"} />
         </div>
       </main>
     );
   }
 
-  if (plate.status === "BLANK") return <NoticeView icon={<Sparkles className="h-7 w-7" />} title="Placa nova" text="Essa placa ainda não foi ativada. Fale com quem te vendeu." />;
+  if (plate.status === "BLANK") return <NoticeView icon={<Sparkles className="h-7 w-7" />} title="Placa nova" text="Essa placa ainda não foi ativada. Fale com quem te vendeu." action={{ href: `/login?next=${encodeURIComponent(platePath(code))}`, label: "Sou vendedor: entrar e ativar" }} />;
   if (plate.status === "DISABLED" || !plate.client || !plate.kind)
     return <NoticeView icon={<Pause className="h-7 w-7" />} title="Placa desativada" text="Essa placa está desligada no momento." />;
 
