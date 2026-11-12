@@ -90,6 +90,7 @@ model Client {
 model Plate {
   id            String      @id @default(cuid())
   code          String      @unique
+  seq           Int?        @unique // número da placa (SNFC<seq>)
   status        PlateStatus @default(BLANK)
   kind          PlateKind?
   batch         Int         @default(0)

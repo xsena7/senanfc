@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
-import { normalizeCode } from "@/lib/codes";
+import { normalizeCode, platePath } from "@/lib/codes";
 import { brl, plural, startOfDayBR, startOfMonthBR } from "@/lib/format";
 import { SaleRow } from "@/components/sale-row";
 import { SmartphoneNfc } from "lucide-react";
@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 async function goToPlate(f: FormData) {
   "use server";
   const code = normalizeCode(String(f.get("code") ?? ""));
-  if (code) redirect(`/p/${code}`);
+  if (code) redirect(platePath(code));
 }
 
 export default async function PainelHome() {
@@ -39,7 +39,7 @@ export default async function PainelHome() {
         <p className="flex items-center gap-2 text-lg font-bold"><SmartphoneNfc className="h-6 w-6" /> Para vender</p>
         <p className="mt-1 text-sm opacity-90">Encoste o iPhone numa placa nova. Vai abrir a tela de ativar: escolha o que ela abre, preencha o cliente e pronto.</p>
         <form action={goToPlate} className="mt-3 flex gap-2">
-          <input name="code" className="input bg-white text-slate-900" placeholder="Ou digite o código da placa" autoCapitalize="characters" />
+          <input name="code" className="input bg-white text-slate-900" placeholder="Ou digite o número da placa (ex.: 7)" inputMode="numeric" />
           <button className="btn shrink-0 bg-white text-brand-700">Abrir</button>
         </form>
       </div>

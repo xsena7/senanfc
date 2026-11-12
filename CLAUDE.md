@@ -7,7 +7,7 @@ Sistema para vender placas de mesa com etiqueta NFC em Goiânia (Pix, avaliaçã
 - Nunca pedir/aceitar senhas ou chaves no chat. O repositório é PÚBLICO: nunca commitar segredos.
 
 ## Ideia central
-Cada etiqueta é gravada (e travada) em casa com um link único `https://senanfc.com.br/p/<CÓDIGO>`. O destino fica no banco, então dá para trocar Pix/Instagram/etc. sem mexer na placa.
+Cada etiqueta é gravada (e travada) em casa com um link em sequência `https://senanfc.com.br/SNFC1`, `/SNFC2`... (`Plate.seq`, `src/lib/codes.ts`; rota `src/app/[code]` só aceita `SNFC<n>`). Códigos antigos aleatórios continuam em `/p/<código>`. A página da placa fica em `src/app/p/[code]/plate-page.tsx`. O destino fica no banco, então dá para trocar Pix/Instagram/etc. sem mexer na placa.
 - Vendedor logado encosta numa placa nova → tela de ativar (`src/app/p/[code]/activate.tsx`): escolhe o que abre, cliente (novo ou existente), venda e pagamento.
 - Logado + placa ativa → tela de gerenciar (`manage.tsx`), com "Testar" (`?ver=1`).
 - Público: WhatsApp/Instagram/Google redirecionam; Pix mostra a chave + "Pix copia e cola" (`src/lib/pix.ts`); Kit mostra página com botões. Toque só conta sem login (tabela `Tap`).

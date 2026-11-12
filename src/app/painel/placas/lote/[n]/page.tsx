@@ -12,7 +12,7 @@ export default async function Lote({ params }: { params: Promise<{ n: string }> 
   await requireAdmin();
   const batch = Number((await params).n);
   if (!Number.isInteger(batch)) notFound();
-  const plates = await db.plate.findMany({ where: { batch }, orderBy: { createdAt: "asc" }, include: { client: true } });
+  const plates = await db.plate.findMany({ where: { batch }, orderBy: [{ seq: "asc" }, { createdAt: "asc" }], include: { client: true } });
   if (!plates.length) notFound();
   return (
     <div className="space-y-4">

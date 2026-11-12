@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { KIND_LABEL } from "@/lib/catalog";
 import { KindIcon } from "@/components/icons";
+import { platePath } from "@/lib/codes";
 import { SaleRow } from "@/components/sale-row";
 import { EditClient } from "./edit";
 
@@ -32,7 +33,7 @@ export default async function Cliente({ params, searchParams }: { params: Promis
       <h2 className="font-bold">Placas</h2>
       {plates.length === 0 && <p className="text-sm text-slate-500">Nenhuma placa.</p>}
       {plates.map((p) => (
-        <Link key={p.id} href={`/p/${p.code}`} className="card flex items-center justify-between">
+        <Link key={p.id} href={platePath(p.code)} className="card flex items-center justify-between">
           <div className="flex items-center gap-3">
             {p.kind && <KindIcon kind={p.kind} />}
             <div>

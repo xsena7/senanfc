@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { changeKindAction, resetPlateAction, setPlateStatusAction } from "@/app/actions/plates";
 import { KIND_LABEL, type PlateKindT } from "@/lib/catalog";
 import { KindIcon } from "@/components/icons";
+import { platePath } from "@/lib/codes";
 import { CircleCheck, Eye } from "lucide-react";
 import { ConfirmButton } from "@/components/form-bits";
 
@@ -48,7 +49,7 @@ export async function ManagePlate({ code, justActivated, isAdmin }: { code: stri
       </div>
 
       {plate.status === "ACTIVE" && (
-        <a href={`/p/${plate.code}?ver=1`} className="btn-primary w-full py-4 text-lg">
+        <a href={`${platePath(plate.code)}?ver=1`} className="btn-primary w-full py-4 text-lg">
           <Eye className="h-5 w-5" /> Testar (abrir como o cliente)
         </a>
       )}

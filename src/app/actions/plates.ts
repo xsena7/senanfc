@@ -3,7 +3,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { requireAdmin, requireUser } from "@/lib/auth";
-import { newCode, normalizeCode } from "@/lib/codes";
+import { normalizeCode, platePath, seqCode } from "@/lib/codes";
 import { missingForKind, parseClient } from "@/lib/client-form";
 import { PRODUCT_PLATES, PRODUCT_PRICE, type PaymentT, type PlateKindT, type ProductT } from "@/lib/catalog";
 import type { FormState } from "./auth";
@@ -76,7 +76,7 @@ export async function activatePlateAction(_: FormState, f: FormData): Promise<Fo
   }
 
   revalidatePath("/painel");
-  redirect(`/p/${code}?ok=1`);
+  redirect(`${platePath(code)}?ok=1`);
 }
 
 export async function changeKindAction(f: FormData) {
@@ -120,13 +120,16 @@ export async function createBatchAction(_: FormState, f: FormData): Promise<Form
   await requireAdmin();
   const qty = Number(f.get("qty"));
   if (!Number.isInteger(qty) || qty < 1 || qty > 500) return { error: "Quantidade de 1 a 500." };
-  const last = await db.plate.aggregate({ _max: { batch: true } });
+  // Continua a contagem: SNFC1, SNFC2, ...
+  const last = await db.plate.aggregate({ _max: { batch: true, seq: true } });
   const batch = (last._max.batch ?? 0) + 1;
-  const codes = new Set<string>();
-  while (codes.size < qty) codes.add(newCode());
-  const taken = await db.plate.findMany({ where: { code: { in: [...codes] } }, select: { code: true } });
-  for (const t of taken) codes.delete(t.code);
-  await db.plate.createMany({ data: [...codes].map((code) => ({ code, batch })) });
+  const start = (last._max.seq ?? 0) + 1;
+  const data = Array.from({ length: qty }, (_, i) => ({ seq: start + i, code: seqCode(start + i), batch }));
+  try {
+    await db.plate.createMany({ data });
+  } catch {
+    return { error: "Não deu certo (outro lote foi criado ao mesmo tempo). Tente de novo." };
+  }
   redirect(`/painel/placas/lote/${batch}`);
 }
 

@@ -10,7 +10,7 @@ export default async function Etiquetas({ params }: { params: Promise<{ n: strin
   await requireAdmin();
   const batch = Number((await params).n);
   if (!Number.isInteger(batch)) notFound();
-  const plates = await db.plate.findMany({ where: { batch }, orderBy: { createdAt: "asc" } });
+  const plates = await db.plate.findMany({ where: { batch }, orderBy: [{ seq: "asc" }, { createdAt: "asc" }] });
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between print:hidden">
