@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Activity, ArrowRight, Hand, Store, Tags } from "lucide-react";
 import { db } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { normalizeCode, platePath } from "@/lib/codes";
-import { brl, plural, startOfDayBR, startOfMonthBR } from "@/lib/format";
-import { SaleRow } from "@/components/sale-row";
-import { SmartphoneNfc } from "lucide-react";
+import { dateTime, startOfDayBR } from "@/lib/format";
+import { KIND_LABEL } from "@/lib/catalog";
+import { KindIcon } from "@/components/icons";
 
 export const dynamic = "force-dynamic";
 
@@ -17,70 +18,84 @@ async function goToPlate(f: FormData) {
 
 export default async function PainelHome() {
   const user = await requireUser();
-  const admin = user.role === "ADMIN";
-  const mine = admin ? {} : { sellerId: user.id };
   const today = startOfDayBR();
-  const month = startOfMonthBR();
-
-  const [day, mon, pending, last, stock, tapsToday, bySeller] = await Promise.all([
-    db.sale.aggregate({ where: { ...mine, createdAt: { gte: today } }, _sum: { priceCents: true }, _count: true }),
-    db.sale.aggregate({ where: { ...mine, createdAt: { gte: month } }, _sum: { priceCents: true }, _count: true }),
-    db.sale.aggregate({ where: { ...mine, payment: "PENDENTE" }, _sum: { priceCents: true }, _count: true }),
-    db.sale.findMany({ where: mine, orderBy: { createdAt: "desc" }, take: 8, include: { client: true, seller: true, plates: true } }),
-    admin ? db.plate.count({ where: { status: "BLANK" } }) : Promise.resolve(0),
-    admin ? db.tap.count({ where: { createdAt: { gte: today } } }) : Promise.resolve(0),
-    admin ? db.sale.groupBy({ by: ["sellerId"], where: { createdAt: { gte: month } }, _sum: { priceCents: true }, _count: true }) : Promise.resolve([]),
+  const [active, blank, clients, tapsToday, todayActivated, last] = await Promise.all([
+    db.plate.count({ where: { status: "ACTIVE" } }),
+    db.plate.count({ where: { status: "BLANK" } }),
+    db.client.count(),
+    db.tap.count({ where: { createdAt: { gte: today } } }),
+    db.plate.count({ where: { activatedAt: { gte: today } } }),
+    db.plate.findMany({ where: { status: { not: "BLANK" } }, orderBy: { activatedAt: "desc" }, take: 6, include: { client: true, activatedBy: true } }),
   ]);
-  const sellers = admin ? await db.user.findMany({ where: { id: { in: bySeller.map((b) => b.sellerId) } } }) : [];
+  const hour = Number(new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo", hour: "numeric", hour12: false }));
+  const hello = hour < 12 ? "Bom dia" : hour < 18 ? "Boa tarde" : "Boa noite";
 
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl bg-gradient-to-br from-brand-600 to-cyan-500 p-5 text-white shadow-[0_15px_40px_-15px_rgba(37,84,232,.7)]">
-        <p className="flex items-center gap-2 text-lg font-bold"><SmartphoneNfc className="h-6 w-6" /> Para vender</p>
-        <p className="mt-1 text-sm opacity-90">Encoste o iPhone numa placa nova. Vai abrir a tela de ativar: escolha o que ela abre, preencha o cliente e pronto.</p>
-        <form action={goToPlate} className="mt-3 flex gap-2">
-          <input name="code" className="input bg-white text-slate-900" placeholder="Ou digite o número da placa (ex.: 7)" inputMode="numeric" />
-          <button className="btn shrink-0 bg-white text-brand-700">Abrir</button>
+      <div>
+        <p className="text-sm text-white/50">{hello},</p>
+        <h1 className="text-2xl font-extrabold tracking-tight text-white">{user.name.split(" ")[0]}</h1>
+      </div>
+
+      {/* Ativar */}
+      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-brand-600 via-brand-500 to-cyan-400 p-5 shadow-[0_25px_60px_-20px_rgba(37,84,232,.9)]">
+        <div className="pointer-events-none absolute -right-8 -top-8 h-40 w-40">
+          <span className="nfc-ring absolute inset-0 rounded-full border-2 border-white/40" />
+          <span className="nfc-ring absolute inset-0 rounded-full border-2 border-white/40 [animation-delay:.8s]" />
+          <span className="nfc-ring absolute inset-0 rounded-full border-2 border-white/40 [animation-delay:1.6s]" />
+        </div>
+        <p className="relative flex items-center gap-2 text-lg font-bold text-white">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/20"><Hand className="h-5 w-5" /></span>
+          Ativar placa
+        </p>
+        <p className="relative mt-2 text-sm text-white/85">Encoste o iPhone na placa nova. Abre a tela: estabelecimento, do que é a placa, links e pronto.</p>
+        <form action={goToPlate} className="relative mt-4 flex gap-2">
+          <input name="code" className="w-full rounded-xl border border-white/30 bg-white/15 px-3 py-3 text-white outline-none placeholder:text-white/60 focus:bg-white/25" placeholder="Ou digite o número (ex.: 8)" inputMode="numeric" />
+          <button className="btn shrink-0 text-[#1d43c4] hover:opacity-90" style={{ backgroundColor: "#fff" }}>Abrir <ArrowRight className="h-4 w-4" /></button>
         </form>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <Stat label="Hoje" value={brl(day._sum.priceCents ?? 0)} sub={plural(day._count, "venda", "vendas")} />
-        <Stat label="Este mês" value={brl(mon._sum.priceCents ?? 0)} sub={plural(mon._count, "venda", "vendas")} />
-        <Stat label="Fica devendo" value={brl(pending._sum.priceCents ?? 0)} sub={plural(pending._count, "venda", "vendas")} warn={pending._count > 0} />
-        {admin && <Stat label="Placas novas em estoque" value={String(stock)} sub={`${tapsToday} toques hoje`} />}
+        <Stat icon={<Tags className="h-4 w-4" />} label="Placas ativas" value={active} sub={`+${todayActivated} hoje`} accent="from-emerald-400 to-teal-300" />
+        <Stat icon={<Tags className="h-4 w-4" />} label="Placas novas" value={blank} sub="prontas para ativar" accent="from-brand-500 to-cyan-400" />
+        <Stat icon={<Store className="h-4 w-4" />} label="Estabelecimentos" value={clients} sub="cadastrados" accent="from-violet-400 to-fuchsia-400" />
+        <Stat icon={<Activity className="h-4 w-4" />} label="Toques hoje" value={tapsToday} sub="clientes encostaram" accent="from-amber-300 to-orange-400" />
       </div>
 
-      {admin && bySeller.length > 0 && (
-        <div className="card">
-          <p className="mb-2 font-bold">Vendedores no mês</p>
-          {bySeller.map((b) => (
-            <div key={b.sellerId} className="flex justify-between border-t border-slate-100 py-2 text-sm first:border-0">
-              <span>{sellers.find((s) => s.id === b.sellerId)?.name ?? "—"}</span>
-              <span className="font-semibold">{brl(b._sum.priceCents ?? 0)} · {plural(b._count, "venda", "vendas")}</span>
-            </div>
-          ))}
-        </div>
-      )}
-
-      <div className="flex items-center justify-between">
-        <h2 className="font-bold">Últimas vendas</h2>
+      <div className="flex items-center justify-between pt-2">
+        <h2 className="font-bold text-white">Últimas configurações</h2>
         <Link href="/painel/vendas" className="text-sm font-semibold text-brand-600">ver todas</Link>
       </div>
-      {last.length === 0 && <p className="text-sm text-slate-500">Nenhuma venda ainda.</p>}
-      {last.map((s) => (
-        <SaleRow key={s.id} s={s} showSeller={admin} isAdmin={admin} />
-      ))}
+      {last.length === 0 && <p className="text-sm text-slate-500">Nenhuma placa ativada ainda.</p>}
+      <div className="space-y-2">
+        {last.map((p) => (
+          <Link key={p.id} href={platePath(p.code)} className="card flex items-center gap-3 p-3">
+            {p.kind && <KindIcon kind={p.kind} />}
+            <div className="min-w-0 flex-1">
+              <p className="truncate font-semibold text-white">{p.client?.name ?? "—"}</p>
+              <p className="text-xs text-slate-500">{p.code} · {p.kind ? KIND_LABEL[p.kind] : ""}</p>
+            </div>
+            <div className="text-right text-xs">
+              <p className="font-semibold text-white/80">{p.activatedBy?.name.split(" ")[0] ?? ""}</p>
+              <p className="text-slate-500">{p.activatedAt ? dateTime(p.activatedAt) : ""}</p>
+            </div>
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }
 
-function Stat({ label, value, sub, warn }: { label: string; value: string; sub: string; warn?: boolean }) {
+function Stat({ icon, label, value, sub, accent }: { icon: React.ReactNode; label: string; value: number; sub: string; accent: string }) {
   return (
-    <div className={`card ${warn ? "border-amber-300 bg-amber-50" : ""}`}>
-      <p className="text-xs font-semibold text-slate-500">{label}</p>
-      <p className="mt-1 text-xl font-extrabold">{value}</p>
-      <p className="text-xs text-slate-500">{sub}</p>
+    <div className="card relative overflow-hidden">
+      <div className={`pointer-events-none absolute -right-6 -top-6 h-20 w-20 rounded-full bg-gradient-to-br ${accent} opacity-20 blur-2xl`} />
+      <p className="flex items-center gap-1.5 text-xs font-semibold text-white/55">
+        <span className={`flex h-6 w-6 items-center justify-center rounded-lg bg-gradient-to-br ${accent} text-[#05070d]`}>{icon}</span>
+        {label}
+      </p>
+      <p className="mt-2 text-3xl font-extrabold tracking-tight text-white">{value}</p>
+      <p className="text-xs text-white/45">{sub}</p>
     </div>
   );
 }

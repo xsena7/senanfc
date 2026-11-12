@@ -17,10 +17,10 @@ export default async function Etiquetas({ params }: { params: Promise<{ n: strin
         <h1 className="text-xl font-extrabold">Etiquetas · Lote {batch}</h1>
         <PrintButton />
       </div>
-      <div className="grid grid-cols-4 gap-2 bg-white p-2">
+      <div className="grid grid-cols-4 gap-2 rounded-xl p-2" style={{ background: "#fff", color: "#000" }}>
         {plates.map((p) => (
-          <div key={p.id} className="rounded border border-dashed border-slate-400 p-2 text-center">
-            <p className="text-[10px] text-slate-500">senanfc.com.br</p>
+          <div key={p.id} className="rounded p-2 text-center" style={{ border: "1px dashed #94a3b8" }}>
+            <p className="text-[10px]" style={{ color: "#64748b" }}>senanfc.com.br</p>
             <p className="font-mono text-base font-bold">{p.code}</p>
           </div>
         ))}

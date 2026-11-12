@@ -22,7 +22,7 @@ const ALL: Key[] = ["WHATSAPP", "INSTAGRAM", "PIX", "GOOGLE", "NOTES"];
  * Campos do cliente. "only" mostra só o que a placa precisa; os outros ficam escondidos
  * (mas continuam sendo enviados com o valor atual, para não apagar nada do cliente).
  */
-export function ClientFields({ v = {}, only }: { v?: ClientValues; only?: Key[] }) {
+export function ClientFields({ v = {}, only, hideName }: { v?: ClientValues; only?: Key[]; hideName?: boolean }) {
   const [pixType, setPixType] = useState<string>(v.pixKeyType ?? "");
   const [more, setMore] = useState(false);
   const show = (k: Key) => !only || more || only.includes(k);
@@ -41,10 +41,14 @@ export function ClientFields({ v = {}, only }: { v?: ClientValues; only?: Key[] 
           <input type="hidden" name="pixCity" value={v.pixCity ?? ""} />
         </>
       )}
-      <div>
-        <label className="label">Nome da loja *</label>
-        <input name="name" defaultValue={v.name ?? ""} className="input" placeholder="Ex.: Padaria do Zé" required />
-      </div>
+      {hideName ? (
+        <input type="hidden" name="name" value={v.name ?? ""} />
+      ) : (
+        <div>
+          <label className="label">Nome do estabelecimento *</label>
+          <input name="name" defaultValue={v.name ?? ""} className="input" placeholder="Ex.: Padaria do Zé" required />
+        </div>
+      )}
       {show("WHATSAPP") && <div>
         <label className="label flex items-center gap-2"><KindIcon kind="WHATSAPP" size="sm" /> WhatsApp da loja</label>
         <input name="whatsapp" defaultValue={fmtZap(v.whatsapp)} className="input" inputMode="tel" placeholder="(62) 99999-8888" />

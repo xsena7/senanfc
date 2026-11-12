@@ -11,8 +11,8 @@ export function NewUser() {
       <input name="login" className="input" placeholder="Usuário para entrar (ex.: joao)" autoCapitalize="none" required />
       <input name="password" type="password" className="input" placeholder="Senha (mín. 8)" autoComplete="new-password" required />
       <select name="role" className="input" defaultValue="SELLER">
-        <option value="SELLER">Vendedor (vê só as vendas dele)</option>
-        <option value="ADMIN">Dono (vê tudo)</option>
+        <option value="SELLER">Vendedor (ativa e configura placas)</option>
+        <option value="ADMIN">Dono (tudo, inclusive lotes e equipe)</option>
       </select>
       <Msg state={state} />
       <Submit pending="Criando...">Adicionar</Submit>

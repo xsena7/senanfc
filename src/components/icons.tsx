@@ -45,7 +45,7 @@ export function WhatsappGlyph({ className = "h-5 w-5" }: P) {
 
 const TILE: Record<PlateKindT, string> = {
   PIX: "bg-[#32BCAD] text-white",
-  GOOGLE: "bg-white",
+  GOOGLE: "bg-[#fff]",
   INSTAGRAM: "bg-gradient-to-br from-[#feda75] via-[#d62976] to-[#4f5bd5] text-white",
   WHATSAPP: "bg-[#25D366] text-white",
   KIT: "bg-gradient-to-br from-brand-500 to-cyan-400 text-white",

@@ -8,7 +8,9 @@ Sistema para vender placas de mesa com etiqueta NFC em Goiânia (Pix, avaliaçã
 
 ## Ideia central
 Cada etiqueta é gravada (e travada) em casa com um link em sequência `https://senanfc.com.br/SNFC1`, `/SNFC2`... (`Plate.seq`, `src/lib/codes.ts`; rota `src/app/[code]` só aceita `SNFC<n>`). Códigos antigos aleatórios continuam em `/p/<código>`. A página da placa fica em `src/app/p/[code]/plate-page.tsx`. O destino fica no banco, então dá para trocar Pix/Instagram/etc. sem mexer na placa.
-- Vendedor logado encosta numa placa nova → tela de ativar (`src/app/p/[code]/activate.tsx`): escolhe o que abre, cliente (novo ou existente), venda e pagamento.
+- Vendedor logado encosta numa placa nova → tela de ativar (`src/app/p/[code]/activate.tsx`): 1) estabelecimento (sugere os já cadastrados), 2) do que é a placa (Instagram, WhatsApp, Google, Pix, Kit completo), 3) só os links daquela placa → Ativar. Comprou 2? Ativa uma, depois a outra.
+- **Painel é só de configuração: sem valores nem pagamentos** (o vendedor recebe direto e dá desconto). A tabela `Sale` existe no banco mas não é usada. A aba "Vendas" (`src/app/painel/vendas`) mostra quantas placas foram configuradas, por quem e quando (`Plate.activatedAt/activatedById`).
+- Clientes em gavetas (`src/app/painel/clientes`): abre e vê todas as placas do estabelecimento.
 - Logado + placa ativa → tela de gerenciar (`manage.tsx`), com "Testar" (`?ver=1`).
 - Público: WhatsApp/Instagram/Google redirecionam; Pix mostra a chave + "Pix copia e cola" (`src/lib/pix.ts`); Kit mostra página com botões. Toque só conta sem login (tabela `Tap`).
 
@@ -16,15 +18,15 @@ Cada etiqueta é gravada (e travada) em casa com um link em sequência `https://
 Next.js 15 (App Router, server actions) · Prisma 6 + Postgres (Neon) · Tailwind 4 · hospedado na Vercel (build: `npm run vercel-build`, roda `prisma migrate deploy`).
 
 ## Onde fica cada coisa
-- Preços e nomes de produto: `src/lib/catalog.ts` (1 placa 69,90 · 2 placas 100 · kit 139,90).
+- Nomes dos tipos de placa e preços mostrados só no site: `src/lib/catalog.ts`.
 - Login (sessão em cookie `snfc`, tabela `Session`): `src/lib/auth.ts`. Primeiro acesso cria o dono em `/setup`.
 - Validação dos dados do cliente: `src/lib/client-form.ts`, `src/lib/links.ts`, `src/lib/pix-key.ts`.
-- Ações: `src/app/actions/*.ts`. Painel: `src/app/painel/*` (Placas e Equipe só para ADMIN; vendedor vê só as vendas dele).
+- Ações: `src/app/actions/*.ts`. Painel: `src/app/painel/*` (Placas e Equipe só para ADMIN).
 - Lotes: `/painel/placas` gera códigos; o lote mostra os links para gravar no NFC Tools (iPhone) ou grava em sequência pelo Chrome do Android (Web NFC, com trava).
 
 ## Visual
 - Site e páginas das placas: visual escuro "tecnológico" (classe `.tech`, `glass`, `text-glow` em `src/app/globals.css`). Página inicial em `src/app/page.tsx`, demonstração em `/demo`, telas públicas em `src/components/public-views.tsx`.
-- Painel: claro, mobile-first. Ícones: `lucide-react` + logos das marcas em `src/components/icons.tsx` (`KindIcon`). Não usar emoji na interface.
+- Painel: escuro também (`tech panel` no layout; `.panel` em `globals.css` converte as classes claras como `bg-white`, `text-slate-500`), animação de entrada em `src/app/painel/template.tsx`, mobile-first. Ícones: `lucide-react` + logos das marcas em `src/components/icons.tsx` (`KindIcon`). Não usar emoji na interface.
 - Botão "Quero minha placa" usa `CONTACT_WHATSAPP` (variável na Vercel).
 
 ## Regras

@@ -5,24 +5,22 @@ import { requireUser } from "@/lib/auth";
 import { KIND_LABEL } from "@/lib/catalog";
 import { KindIcon } from "@/components/icons";
 import { platePath } from "@/lib/codes";
-import { SaleRow } from "@/components/sale-row";
 import { EditClient } from "./edit";
 
 export const dynamic = "force-dynamic";
 
 export default async function Cliente({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ erro?: string }> }) {
-  const user = await requireUser();
+  await requireUser();
   const { id } = await params;
   const { erro } = await searchParams;
   const c = await db.client.findUnique({
     where: { id },
     include: {
       plates: { orderBy: { activatedAt: "desc" }, include: { _count: { select: { taps: true } } } },
-      sales: { orderBy: { createdAt: "desc" }, include: { client: true, seller: true, plates: true } },
     },
   });
   if (!c) notFound();
-  const { plates, sales, ...client } = c;
+  const { plates, ...client } = c;
 
   return (
     <div className="space-y-4">
@@ -50,11 +48,6 @@ export default async function Cliente({ params, searchParams }: { params: Promis
       <h2 className="pt-2 font-bold">Dados (o que as placas abrem)</h2>
       <EditClient c={client} />
 
-      <h2 className="pt-2 font-bold">Vendas</h2>
-      {sales.length === 0 && <p className="text-sm text-slate-500">Nenhuma venda.</p>}
-      {sales.map((s) => (
-        <SaleRow key={s.id} s={s} showSeller={user.role === "ADMIN"} isAdmin={user.role === "ADMIN"} />
-      ))}
     </div>
   );
 }

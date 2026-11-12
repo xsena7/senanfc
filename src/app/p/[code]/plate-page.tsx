@@ -3,7 +3,6 @@ import { db } from "@/lib/db";
 import { currentUser } from "@/lib/auth";
 import { normalizeCode } from "@/lib/codes";
 import { instagramUrl, whatsappUrl } from "@/lib/links";
-import { PRODUCT_PLATES } from "@/lib/catalog";
 import { CircleHelp, Pause, Sparkles } from "lucide-react";
 import { KitView, NoticeView, PixView } from "@/components/public-views";
 import { ActivateForm } from "./activate";
@@ -26,25 +25,24 @@ export async function PlatePage({ raw, sp }: { raw: string; sp: { ver?: string; 
   if (user && !sp.ver) {
     if (plate.status === "BLANK") {
       const clients = await db.client.findMany({
-        orderBy: { createdAt: "desc" },
-        take: 500,
-        include: { sales: { where: { product: "DUO" }, include: { _count: { select: { plates: true } } }, orderBy: { createdAt: "desc" }, take: 5 } },
+        orderBy: { name: "asc" },
+        take: 1000,
+        include: { plates: { where: { status: { not: "BLANK" } }, select: { code: true, kind: true, status: true } } },
       });
-      const list = clients.map(({ sales, createdAt, ...c }) => ({
-        ...c,
-        openSales: sales
-          .filter((s) => s._count.plates < PRODUCT_PLATES[s.product])
-          .map((s) => ({ id: s.id, when: s.createdAt.toISOString(), missing: PRODUCT_PLATES[s.product] - s._count.plates })),
-      }));
+      const list = clients.map(({ createdAt, notes, ...c }) => ({ ...c, notes, plates: c.plates.map((p) => ({ code: p.code, kind: p.kind, off: p.status === "DISABLED" })) }));
       return (
-        <main className="mx-auto max-w-md px-4 py-6">
-          <ActivateForm code={code} clients={list} />
+        <main className="tech panel min-h-dvh">
+          <div className="fade-up mx-auto max-w-md px-4 py-6">
+            <ActivateForm code={code} clients={list} />
+          </div>
         </main>
       );
     }
     return (
-      <main className="mx-auto max-w-md px-4 py-6">
-        <ManagePlate code={code} justActivated={sp.ok === "1"} isAdmin={user.role === "ADMIN"} />
+      <main className="tech panel min-h-dvh">
+        <div className="fade-up mx-auto max-w-md px-4 py-6">
+          <ManagePlate code={code} justActivated={sp.ok === "1"} isAdmin={user.role === "ADMIN"} />
+        </div>
       </main>
     );
   }

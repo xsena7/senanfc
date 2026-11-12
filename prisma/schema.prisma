@@ -110,6 +110,7 @@ model Plate {
   @@index([batch])
 }
 
+// Vendas: tabela guardada para o futuro, hoje o painel não usa (só configuração).
 model Sale {
   id         String   @id @default(cuid())
   clientId   String

@@ -8,21 +8,20 @@ import { CircleCheck, Eye } from "lucide-react";
 import { ConfirmButton } from "@/components/form-bits";
 
 export async function ManagePlate({ code, justActivated, isAdmin }: { code: string; justActivated: boolean; isAdmin: boolean }) {
-  const plate = await db.plate.findUniqueOrThrow({ where: { code }, include: { client: true, sale: { include: { _count: { select: { plates: true } } } } } });
+  const plate = await db.plate.findUniqueOrThrow({ where: { code }, include: { client: true } });
   const week = new Date(Date.now() - 7 * 86400_000);
   const [taps, taps7] = await Promise.all([
     db.tap.count({ where: { plateId: plate.id } }),
     db.tap.count({ where: { plateId: plate.id, createdAt: { gte: week } } }),
   ]);
-  const duoMissing = plate.sale?.product === "DUO" && plate.sale._count.plates < 2;
 
   return (
     <div className="space-y-4">
       {justActivated && (
-        <div className="rounded-2xl bg-emerald-600 p-4 text-white">
+        <div className="rounded-2xl border border-emerald-300/30 bg-gradient-to-br from-emerald-500 to-teal-400 p-4 text-white shadow-[0_20px_50px_-20px_rgba(16,185,129,.9)]">
           <p className="flex items-center gap-2 text-lg font-bold"><CircleCheck className="h-6 w-6" /> Placa ativada!</p>
           <p className="text-sm opacity-90">Toque em &quot;Testar&quot; para ver o que o cliente vai ver.</p>
-          {duoMissing && <p className="mt-2 rounded-lg bg-white/20 p-2 text-sm font-semibold">Venda de 2 placas: agora encoste o celular na 2ª placa.</p>}
+          <p className="mt-2 rounded-lg bg-white/20 p-2 text-sm font-semibold">Vendeu mais de uma? É só encostar na próxima placa.</p>
         </div>
       )}
 

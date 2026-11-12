@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { currentUser } from "@/lib/auth";
-import { Logo } from "@/components/brand";
+import { AuthShell } from "@/components/auth-shell";
 import { LoginForm } from "./form";
 
 export const dynamic = "force-dynamic";
@@ -11,9 +11,8 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   if (await currentUser()) redirect("/painel");
   const { next } = await searchParams;
   return (
-    <main className="mx-auto flex min-h-dvh max-w-sm flex-col justify-center px-4">
-      <Logo className="mb-8 justify-center text-2xl" />
+    <AuthShell title="Bem-vindo de volta" subtitle="Entre para ativar e configurar placas">
       <LoginForm next={next ?? ""} />
-    </main>
+    </AuthShell>
   );
 }
