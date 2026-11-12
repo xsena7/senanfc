@@ -27,15 +27,16 @@ const ARTS = [
   { file: "5-kit-completo", top: "", kit: true, title: "Tudo num <b>toque</b>", sub: "Pague, avalie, siga e fale com a gente.", accent: "#22d3ee" },
 ];
 
-const page = (a) => `<!doctype html><html><head><meta charset="utf-8">
+const page = (a, B = 0) => `<!doctype html><html><head><meta charset="utf-8">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800;900&display=block" rel="stylesheet">
 <style>
-@page { size: 100mm 150mm; margin: 0 }
+@page { size: ${100 + 2 * B}mm ${150 + 2 * B}mm; margin: 0 }
 * { box-sizing: border-box; margin: 0 }
-html, body { width: 100mm; height: 150mm }
+html, body { width: ${100 + 2 * B}mm; height: ${150 + 2 * B}mm }
+.cut { position: absolute; left: ${B}mm; top: ${B}mm; width: 100mm; height: 150mm }
 body { font-family: Inter, -apple-system, system-ui, sans-serif; color: #fff; overflow: hidden; -webkit-print-color-adjust: exact; print-color-adjust: exact;
   background:
-    radial-gradient(70mm 45mm at 50% -5%, rgba(59,110,246,.55), transparent 70%),
+    radial-gradient(70mm 45mm at 50% calc(${B}mm - 7.5mm), rgba(59,110,246,.55), transparent 70%),
     radial-gradient(55mm 40mm at 50% 105%, ${a.accent}40, transparent 70%),
     linear-gradient(rgba(255,255,255,.045) .25mm, transparent .25mm) 0 0/6mm 6mm,
     linear-gradient(90deg, rgba(255,255,255,.045) .25mm, transparent .25mm) 0 0/6mm 6mm,
@@ -62,7 +63,7 @@ h1 b { font-weight: 900 }
 .foot i { font-style: normal; color: rgba(103,232,249,.7) }
 .foot svg { width: 4.2mm; height: 4.2mm }
 .spacer { margin-top: auto }
-</style></head><body><div class="wrap">
+</style></head><body><div class="cut"><div class="wrap">
   ${a.kit ? "" : a.top}
   ${a.stars ? '<div class="stars">★★★★★</div>' : ""}
   <h1 style="${a.kit ? "margin-top:2mm" : ""}">${a.title}</h1>
@@ -80,19 +81,24 @@ h1 b { font-weight: 900 }
 </div>
 <div class="wrap" style="justify-content:flex-end">
   <div class="foot"><svg viewBox="0 0 64 64"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b6ef6"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#g)"/><g fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"><path d="M24 23a13 13 0 0 1 0 18"/><path d="M32 17a21 21 0 0 1 0 30"/><path d="M40 11a29 29 0 0 1 0 42" opacity=".7"/></g><circle cx="16" cy="32" r="4" fill="#fff"/></svg>Sena<i>NFC</i></div>
-</div></body></html>`;
+</div></div></body></html>`;
 
+// Uso: node scripts/gerar-artes.cjs <pasta> [sangria_mm]   (ex.: 3 → arquivo 106x156 mm que corta em 100x150)
 (async () => {
   const out = process.argv[2] || "artes";
+  const B = Number(process.argv[3] || 0);
+  const suf = B ? `-sangria-${B}mm` : "";
   fs.mkdirSync(out, { recursive: true });
   const br = await chromium.launch();
-  // 100x150 mm = 377.95 x 566.93 px CSS; escala 3.125 → 1181 x 1772 px (300 dpi)
-  const pg = await br.newPage({ viewport: { width: 378, height: 567 }, deviceScaleFactor: 3.125 }); // 1181 x 1772 px
+  const mm = 96 / 25.4; // px CSS por mm
+  const W = (100 + 2 * B) * mm, H = (150 + 2 * B) * mm;
+  // escala 3.125 → 300 dpi (sem sangria: 1181 x 1772 px)
+  const pg = await br.newPage({ viewport: { width: Math.ceil(W), height: Math.ceil(H) }, deviceScaleFactor: 3.125 });
   for (const a of ARTS) {
-    await pg.setContent(page(a), { waitUntil: "networkidle" });
+    await pg.setContent(page(a, B), { waitUntil: "networkidle" });
     await pg.evaluate(() => document.fonts.ready);
-    await pg.screenshot({ path: path.join(out, a.file + ".png"), clip: { x: 0, y: 0, width: 378, height: 567 } });
-    await pg.pdf({ path: path.join(out, a.file + ".pdf"), width: "100mm", height: "150mm", printBackground: true });
+    await pg.screenshot({ path: path.join(out, a.file + suf + ".png"), clip: { x: 0, y: 0, width: Math.round(W), height: Math.round(H) } });
+    await pg.pdf({ path: path.join(out, a.file + suf + ".pdf"), width: `${100 + 2 * B}mm`, height: `${150 + 2 * B}mm`, printBackground: true });
   }
   await br.close();
   console.log("ok", out);
