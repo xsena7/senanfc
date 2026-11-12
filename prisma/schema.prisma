@@ -1,0 +1,137 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+enum Role {
+  ADMIN
+  SELLER
+}
+
+enum PlateStatus {
+  BLANK // gravada, ainda não vendida
+  ACTIVE // ligada a um cliente
+  DISABLED // desligada (cancelou, quebrou, trocou)
+}
+
+enum PlateKind {
+  PIX
+  GOOGLE
+  INSTAGRAM
+  WHATSAPP
+  KIT
+}
+
+enum PixKeyType {
+  CPF
+  CNPJ
+  PHONE
+  EMAIL
+  RANDOM
+}
+
+enum Product {
+  SINGLE // 1 placa
+  DUO // 2 placas quaisquer
+  KIT // 1 placa com os 4 links
+}
+
+enum Payment {
+  PIX
+  DINHEIRO
+  CARTAO
+  PENDENTE
+}
+
+model User {
+  id           String    @id @default(cuid())
+  name         String
+  login        String    @unique
+  passwordHash String
+  role         Role      @default(SELLER)
+  active       Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  sessions     Session[]
+  sales        Sale[]
+  activations  Plate[]   @relation("ActivatedBy")
+}
+
+model Session {
+  id        String   @id // hash do token
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Client {
+  id         String      @id @default(cuid())
+  name       String
+  whatsapp   String?
+  instagram  String?
+  pixKey     String?
+  pixKeyType PixKeyType?
+  pixName    String? // nome de quem recebe
+  pixCity    String? // cidade do recebedor
+  googleUrl  String?
+  notes      String?
+  createdAt  DateTime    @default(now())
+  plates     Plate[]
+  sales      Sale[]
+}
+
+model Plate {
+  id            String      @id @default(cuid())
+  code          String      @unique
+  status        PlateStatus @default(BLANK)
+  kind          PlateKind?
+  batch         Int         @default(0)
+  writtenAt     DateTime?
+  clientId      String?
+  client        Client?     @relation(fields: [clientId], references: [id])
+  saleId        String?
+  sale          Sale?       @relation(fields: [saleId], references: [id])
+  activatedAt   DateTime?
+  activatedById String?
+  activatedBy   User?       @relation("ActivatedBy", fields: [activatedById], references: [id])
+  createdAt     DateTime    @default(now())
+  taps          Tap[]
+
+  @@index([clientId])
+  @@index([status])
+  @@index([batch])
+}
+
+model Sale {
+  id         String   @id @default(cuid())
+  clientId   String
+  client     Client   @relation(fields: [clientId], references: [id])
+  sellerId   String
+  seller     User     @relation(fields: [sellerId], references: [id])
+  product    Product
+  priceCents Int
+  payment    Payment
+  paidAt     DateTime?
+  createdAt  DateTime @default(now())
+  plates     Plate[]
+
+  @@index([createdAt])
+  @@index([sellerId])
+}
+
+model Tap {
+  id        String   @id @default(cuid())
+  plateId   String
+  plate     Plate    @relation(fields: [plateId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([plateId, createdAt])
+  @@index([createdAt])
+}

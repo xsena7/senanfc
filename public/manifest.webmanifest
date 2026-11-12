@@ -1,0 +1,9 @@
+{
+  "name": "Sena NFC",
+  "short_name": "Sena NFC",
+  "start_url": "/painel",
+  "display": "standalone",
+  "background_color": "#f4f6fb",
+  "theme_color": "#2554e8",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}
