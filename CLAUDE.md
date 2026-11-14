@@ -30,7 +30,7 @@ Next.js 15 (App Router, server actions) · Prisma 6 + Postgres (Neon) · Tailwin
 - Botão "Quero minha placa" usa `CONTACT_WHATSAPP` (variável na Vercel).
 
 ## Link do Google (avaliação)
-- O vendedor cola o link do Google Maps; `src/lib/google-resolve.ts` (ação `src/app/actions/google.ts`, campo `src/components/google-field.tsx`) segue o link curto só por domínios do Google e monta o link: com ID `ChIJ` no link → `search.google.com/local/writereview?placeid=`; com `GOOGLE_PLACES_API_KEY` (opcional) → pergunta o ID ao Google; senão usa o código do lugar (`!1s0x..:0x..`) → `google.com/search?...#lrd=<código>,3` (abre "Escrever avaliação"). Gerador externo só como plano B.
+- O vendedor cola o link do Google Maps; `src/lib/google-resolve.ts` (ação `src/app/actions/google.ts`, campo `src/components/google-field.tsx`) segue o link curto só por domínios do Google e monta o link: com ID `ChIJ` no link → `search.google.com/local/writereview?placeid=`; com `GOOGLE_PLACES_API_KEY` (opcional) → pergunta o ID ao Google; sem chave e sem ID no link → avisa e mostra o gerador externo (o link `#lrd=` da busca do Google NÃO abre a avaliação no iPhone; testado).
 
 ## App (PWA)
 - Manifesto em `src/app/manifest.ts` (abre em `/painel`), ícones PNG em `public/` (`icon-192/512`, `icon-maskable-512`, `apple-touch-icon`), service worker `public/sw.js` (só a página `offline.html`, não guarda telas do painel). Cartão "Instale o app" em `src/components/pwa.tsx`.

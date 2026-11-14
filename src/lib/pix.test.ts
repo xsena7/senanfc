@@ -39,8 +39,8 @@ test("link do Google", () => {
   assert.equal(googleLinkKind("https://maps.app.goo.gl/xyz"), "other");
   assert.equal(googleLinkKind(""), "");
 });
-test("link lrd conta como avaliação", () => {
-  assert.equal(googleLinkKind("https://www.google.com/search?q=x&ludocid=1#lrd=0x935ef1b2:0x5a1b2c3d,3,,,,"), "review");
+test("link lrd não conta como avaliação (no celular abre só a página da loja)", () => {
+  assert.equal(googleLinkKind("https://www.google.com/search?q=x&ludocid=1#lrd=0x935ef1b2:0x5a1b2c3d,3,,,,"), "other");
 });
 
 import { detectPixKeyType } from "./pix-key.ts";

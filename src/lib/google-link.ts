@@ -15,7 +15,5 @@ export function googleLinkKind(raw: string): "" | "review" | "other" {
   if (host === "g.page" && /^\/r\/[^/]+\/review\/?$/.test(u.pathname)) return "review";
   // Link curto de avaliação do Google
   if (host === "g.co" && u.pathname.startsWith("/kgs/")) return "review";
-  // Busca do Google com #lrd=<código>,3 (abre "Escrever avaliação")
-  if (/^google\.[a-z.]+$/.test(host) && u.pathname === "/search" && /lrd=0x[0-9a-f]+:0x[0-9a-f]+,3/i.test(u.hash)) return "review";
   return "other";
 }

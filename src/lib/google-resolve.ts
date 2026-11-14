@@ -4,8 +4,8 @@ import { googleLinkKind } from "./google-link";
 // 1) se o link já é de avaliação, usa; 2) segue o link curto (maps.app.goo.gl) só por domínios do Google;
 // 3) se o endereço final tem o ID da loja (ChIJ...), monta o link oficial (writereview?placeid=);
 // 4) se houver GOOGLE_PLACES_API_KEY (opcional), pergunta o ID ao Google (Text Search "IDs only", gratuita);
-// 5) senão usa o código do lugar que todo link de loja tem (!1s0x...:0x...) e monta a busca do Google
-//    com "#lrd=<código>,3", que abre a janela "Escrever avaliação" daquela loja.
+// 5) sem chave e sem ID no link: avisa (o link "#lrd=" da busca do Google só abre a página da loja no celular,
+//    não a janela de avaliar — testado no iPhone).
 
 export const reviewUrl = (placeId: string) => `https://search.google.com/local/writereview?placeid=${placeId}`;
 
@@ -37,13 +37,6 @@ export function featureIdFromUrl(url: string): string | null {
   const d = safeDecode(url);
   const m = d.match(/(?:!1s|ftid=)(0x[0-9a-f]+:0x[0-9a-f]+)/i);
   return m ? m[1].toLowerCase() : null;
-}
-
-/** Link da busca do Google que abre "Escrever avaliação" da loja (sem chave, sem terceiros). */
-export function lrdReviewUrl(name: string | null, featureId: string): string {
-  const cid = BigInt(featureId.split(":")[1]).toString();
-  const q = new URLSearchParams({ q: name || "avaliar", ludocid: cid, hl: "pt-BR" });
-  return `https://www.google.com/search?${q.toString()}#lrd=${featureId},3,,,,`;
 }
 
 /** Nome e coordenadas da loja num link longo do Google Maps. */
@@ -131,11 +124,11 @@ export async function resolveReviewLink(raw: string, key: string | undefined, f:
     try {
       const found = await findPlaceId(hint.name, hint.lat, hint.lng, key, f);
       if (found) return { url: reviewUrl(found) };
+      return { error: "Não achei essa loja no Google. Confira o link ou use o gerador grátis abaixo." };
     } catch {
-      // segue para o link sem chave
+      return { error: "O Google não respondeu agora. Tente de novo ou use o gerador grátis abaixo." };
     }
   }
-  const fid = featureIdFromUrl(final);
-  if (fid) return { url: lrdReviewUrl(hint.name, fid) };
-  return { error: "Esse link não é de uma loja. No Google Maps, abra a loja, toque em Compartilhar e copie o link." };
+  if (!hint.name && !featureIdFromUrl(final)) return { error: "Esse link não é de uma loja. No Google Maps, abra a loja, toque em Compartilhar e copie o link." };
+  return { error: "Para gerar sozinho falta configurar a chave do Google. Por enquanto, use o gerador grátis abaixo." };
 }

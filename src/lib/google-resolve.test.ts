@@ -34,16 +34,10 @@ test("link curto → segue → pergunta o ID ao Google → link de avaliação",
   assert.equal(body.locationBias.circle.center.latitude, -16.6871);
 });
 
-test("sem chave: monta o link de avaliação com o código do lugar", async () => {
-  const { f, calls } = fakeFetch({ "https://maps.app.goo.gl/abc123": { status: 302, location: LONG } });
+test("sem chave: avisa para usar o gerador (não inventa link)", async () => {
+  const { f } = fakeFetch({ "https://maps.app.goo.gl/abc123": { status: 302, location: LONG } });
   const r = await resolveReviewLink("maps.app.goo.gl/abc123", undefined, f);
-  assert.ok("url" in r);
-  const u = new URL((r as { url: string }).url);
-  assert.equal(u.hostname, "www.google.com");
-  assert.equal(u.searchParams.get("q"), "Barbearia do Léo");
-  assert.equal(u.searchParams.get("ludocid"), BigInt("0x5a1b2c3d").toString());
-  assert.equal(u.hash, "#lrd=0x935ef1b2:0x5a1b2c3d,3,,,,");
-  assert.equal(calls.length, 1); // só o próprio Google (link curto)
+  assert.ok("error" in r && r.error.includes("chave"));
 });
 
 test("link que não é de loja", async () => {
